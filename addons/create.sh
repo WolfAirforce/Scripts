@@ -20,6 +20,11 @@ _process_directory () {
     mv $temp_dir/*.inc "./csgo/addons/sourcemod/scripting/include"
   fi
 
+  # unpack package
+  if [[ -d "$1/package" ]]; then
+    mv $1/package/* "$1"
+  fi
+
   # directories
   if [[ -d "$1/maps" || -d "$1/addons" || -d "$1/cfg" ]]; then
     cp -r $1/* "./csgo"
@@ -36,6 +41,10 @@ _process_directory () {
 
   if ls $temp_dir/*.games.txt 1> /dev/null 2>&1; then
     mv $1/*.games.txt "./csgo/addons/sourcemod/gamedata"
+  fi
+
+  if ls $temp_dir/*.phrases.txt 1> /dev/null 2>&1; then
+    mv $1/*.phrases.txt "./csgo/addons/sourcemod/gamedata"
   fi
 }
 
