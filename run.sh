@@ -1,6 +1,17 @@
 #!/bin/bash
 
-pwd_start=$PWD
+if [ -z "$1" ]; then
+  ls ./profiles
+  read -p "Please specify a profile: " PROFILE_NAME
+else
+  PROFILE_NAME=$1
+fi
+
+# Where the script was run from.
+RUN_DIRECTORY=$PWD
+
+# Where the game folder will be built in.
+OUTPUT_DIRECTORY="$PWD/output"
 
 _curl_github () {
   if [[ -n $GITHUB_TOKEN ]]; then
@@ -13,38 +24,54 @@ _curl_github () {
 _process_directory () {
   # fix ur stuff autoexecconfig xd
   if ls $temp_dir/*.sp 1> /dev/null 2>&1; then
-    mv $temp_dir/*.sp "./csgo/addons/sourcemod/scripting"
+    mv $temp_dir/*.sp "$OUTPUT_DIRECTORY/addons/sourcemod/scripting"
   fi
 
   if ls $temp_dir/*.inc 1> /dev/null 2>&1; then
-    mv $temp_dir/*.inc "./csgo/addons/sourcemod/scripting/include"
+    mv $temp_dir/*.inc "$OUTPUT_DIRECTORY/addons/sourcemod/scripting/include"
   fi
 
   # unpack package
   if [[ -d "$1/package" ]]; then
     mv $1/package/* "$1"
+    rm -r $1/package
+  fi
+
+  if [[ -d "$1/common" ]]; then
+    mv $1/common/* "$1"
+    rm -r $1/common
+  fi
+
+  # TODO
+  bhop_path=$(find $1 -type d -name "bhoptimer*")
+
+  if [ $bhop_path ]; then
+    mv $bhop_path/* "$1"
+    rm -r $bhop_path
+
+    ls $1
   fi
 
   # directories
-  if [[ -d "$1/maps" || -d "$1/addons" || -d "$1/cfg" ]]; then
-    cp -r $1/* "./csgo"
+  if [[ -d "$1/maps" || -d "$1/addons" || -d "$1/cfg" || -d "$1/materials" || -d "$1/sound" ]]; then
+    cp -r $1/* "$OUTPUT_DIRECTORY"
   elif [[ -d "$1/sourcemod" || -d "$1/metamod" || -d "$1/stripper" ]]; then
-    cp -r $1/* "./csgo/addons"
+    cp -r $1/* "$OUTPUT_DIRECTORY/addons"
   elif [[ -d "$1/gamedata" || -d "$1/plugins" || -d "$1/scripting" || -d "$1/translations" ]];  then
-    cp -r $1/* "./csgo/addons/sourcemod"
+    cp -r $1/* "$OUTPUT_DIRECTORY/addons/sourcemod"
   fi
   
   # other files
   if ls $temp_dir/*.smx 1> /dev/null 2>&1; then
-    mv $1/*.smx "./csgo/addons/sourcemod/plugins"
+    mv $1/*.smx "$OUTPUT_DIRECTORY/addons/sourcemod/plugins"
   fi
 
   if ls $temp_dir/*.games.txt 1> /dev/null 2>&1; then
-    mv $1/*.games.txt "./csgo/addons/sourcemod/gamedata"
+    mv $1/*.games.txt "$OUTPUT_DIRECTORY/addons/sourcemod/gamedata"
   fi
 
   if ls $temp_dir/*.phrases.txt 1> /dev/null 2>&1; then
-    mv $1/*.phrases.txt "./csgo/addons/sourcemod/gamedata"
+    mv $1/*.phrases.txt "$OUTPUT_DIRECTORY/addons/sourcemod/translations"
   fi
 }
 
@@ -114,21 +141,20 @@ _extract_gh_source () {
 
 _build_sm_plugin () {
   # sudo apt install libc6-dev lib32stdc++6
-  cd ./csgo/addons/sourcemod/scripting
+  cd $OUTPUT_DIRECTORY/addons/sourcemod/scripting
 
-  chmod +x compile.sh
-  chmod +x spcomp
+  chmod +x ./spcomp64
 
-  ./compile.sh $1
-  mv ./compiled/* ../plugins
+  ./spcomp64 $1
+  mv ./*.smx ../plugins
 
-  cd $pwd_start
+  cd $RUN_DIRECTORY
 }
 
 _clean_up () {
   echo "cleaning up..."
 
-  cd ./csgo
+  cd $OUTPUT_DIRECTORY
 
   find . -name LICENSE\* -type f -delete
   find . -name CONTRIBUTING\* -type f -delete
@@ -136,7 +162,26 @@ _clean_up () {
   find . -name README\* -type f -delete
   find . -name CHANGELOG\* -type f -delete
 
-  cd $pwd_start
+  cd $RUN_DIRECTORY
 }
 
-mkdir -p ./csgo
+# Script Start
+
+if [ -d $OUTPUT_DIRECTORY ]; then
+  echo "Output directory ($OUTPUT_DIRECTORY) is not empty."
+  read -p "Remove and continue? (Y/N): " confirm && [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || exit 1
+
+  rm -r $OUTPUT_DIRECTORY
+fi
+
+mkdir -p $OUTPUT_DIRECTORY
+
+source ./profiles/$PROFILE_NAME
+
+_clean_up
+
+cp -r ./input/* $OUTPUT_DIRECTORY
+
+source ./extra.sh
+
+echo "all done :)"

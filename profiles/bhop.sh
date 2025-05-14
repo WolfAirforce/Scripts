@@ -1,5 +1,3 @@
-source ./addons/create.sh
-
 # sourcemod/metamod base
 _extract_direct https://sm.alliedmods.net/smdrop/1.10/$(curl -sL https://sm.alliedmods.net/smdrop/1.10/sourcemod-latest-linux)
 _extract_direct https://mms.alliedmods.net/mmsdrop/1.10/$(curl -sL https://mms.alliedmods.net/mmsdrop/1.10/mmsource-latest-linux)
@@ -42,7 +40,3 @@ _extract_gh_source "rtldg" "mpbhops_but_working"
 _build_sm_plugin "mpbhops_but_working.sp"
 
 _extract_gh_asset "accelerator74" "Cleaner" "0"
-
-_clean_up
-
-echo "all done :)"

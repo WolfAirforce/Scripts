@@ -1,5 +1,3 @@
-source ./addons/create.sh
-
 # sourcemod/metamod base
 _extract_direct https://sm.alliedmods.net/smdrop/1.12/$(curl -sL https://sm.alliedmods.net/smdrop/1.12/sourcemod-latest-linux)
 _extract_direct https://mms.alliedmods.net/mmsdrop/1.12/$(curl -sL https://mms.alliedmods.net/mmsdrop/1.12/mmsource-latest-linux)
@@ -39,7 +37,3 @@ _extract_gh_source "GAMMACASE" "MomSurfFix"
 _build_sm_plugin "momsurffix2.sp"
 
 _extract_gh_asset "accelerator74" "Cleaner" "0"
-
-_clean_up
-
-echo "all done :)"

@@ -1,5 +1,3 @@
-source ./addons/create.sh
-
 # sourcemod/metamod base
 _extract_direct https://sm.alliedmods.net/smdrop/1.12/$(curl -sL https://sm.alliedmods.net/smdrop/1.12/sourcemod-latest-linux)
 _extract_direct https://mms.alliedmods.net/mmsdrop/1.12/$(curl -sL https://mms.alliedmods.net/mmsdrop/1.12/mmsource-latest-linux)
@@ -31,7 +29,3 @@ _extract_gh_source "rogeraabbccdd" "Kento-Rankme"
 _extract_direct "https://www.sourcemod.net/vbcompiler.php?file_id=170330" "afk_manager4.smx"
 _extract_direct "https://forums.alliedmods.net/attachment.php?attachmentid=166646" "afk_manager.phrases.txt"
 _extract_direct "https://forums.alliedmods.net/attachment.php?attachmentid=168028" "afk_manager.inc"
-
-_clean_up
-
-echo "all done :)"
